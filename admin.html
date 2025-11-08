@@ -1,162 +1,162 @@
+<!-- save as admin.html -->
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>HabitForge — Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{--bg:#f6f8fb; --card:#fff; --accent-from:#2b6ef6; --accent-to:#6a9cff; --muted:#6b7280; --radius:12px; --shadow:0 12px 36px rgba(12,18,36,0.06)}
-  *{box-sizing:border-box}
-  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto;background:var(--bg);color:#07122a;padding:16px;display:flex;justify-content:center}
-  .wrap{width:100%;max-width:900px}
-  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-  .card{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);border:1px solid rgba(7,18,42,0.04)}
-  form{display:flex;flex-direction:column;gap:10px}
-  label{font-size:13px}
-  input[type="text"], select, textarea{padding:10px;border-radius:8px;border:1px solid rgba(7,18,42,0.06);font-size:14px}
-  .row{display:flex;gap:8px}
-  .row .col{flex:1}
-  .btn{padding:10px 12px;border-radius:10px;border:0;cursor:pointer;font-weight:600}
-  .btn.primary{background:linear-gradient(90deg,var(--accent-from),var(--accent-to));color:white}
+  :root{--bg:#F6F8FB;--surface:#fff;--muted:#6b7280;--accent:#2b6ef6;--radius:12px}
+  body.dark{--bg:#071226;--muted:#9aa4b2}
+  *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui;background:var(--bg);color:#07122a;padding:12px;display:flex;justify-content:center}
+  .wrap{width:100%;max-width:980px;display:flex;flex-direction:column;gap:12px}
+  header{display:flex;justify-content:space-between;align-items:center}
+  .panel{background:var(--surface);padding:12px;border-radius:12px;border:1px solid rgba(10,20,40,0.04)}
+  form{display:flex;flex-direction:column;gap:8px}
+  input,select,textarea{padding:10px;border-radius:10px;border:1px solid rgba(10,20,40,0.06);width:100%}
+  .list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+  .item{display:flex;gap:10px;align-items:center;padding:8px;border-radius:10px;border:1px solid rgba(10,20,40,0.04)}
+  .thumb{width:84px;height:60px;border-radius:8px;object-fit:cover;background:#eef2ff}
+  .btn{padding:10px 12px;border-radius:10px;border:1px solid rgba(10,20,40,0.06);cursor:pointer}
+  .btn.primary{background:linear-gradient(90deg,var(--accent),#6a9cff);color:#fff;border:0}
   .small{font-size:13px;color:var(--muted)}
-  .list{margin-top:12px;display:flex;flex-direction:column;gap:8px}
-  .item{display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;border:1px solid rgba(7,18,42,0.03);background:linear-gradient(180deg,#fff,#fbfdff)}
-  img.thumb{width:60px;height:40px;object-fit:cover;border-radius:6px}
-  @media (max-width:700px){ .row{flex-direction:column} img.thumb{width:48px;height:36px} }
 </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <div>
-        <h1 style="margin:0">Admin — Add Exercises</h1>
-        <div class="small">Add exercise entries (image/gif link from Drive or direct URL). Choose type and category.</div>
-      </div>
-      <div style="display:flex;gap:8px">
-        <a class="btn" href="index.html">← Dashboard</a>
-        <a class="btn" href="create-plan.html">Open Create Plan</a>
-      </div>
+      <div><strong>Admin</strong><div class="small">Add exercises (image URL/GDrive link)</div></div>
+      <div style="display:flex;gap:8px"><a class="btn" href="index.html">Back</a></div>
     </header>
 
-    <section class="card">
+    <section class="panel">
       <form id="adminForm">
-        <div class="row">
-          <div class="col">
-            <label>Exercise name</label>
-            <input id="exName" type="text" placeholder="e.g., Barbell Biceps Curl" required>
-          </div>
-          <div class="col">
-            <label>Type</label>
-            <select id="exType" required>
-              <option value="workout">Workout</option>
-              <option value="diet">Diet</option>
-              <option value="martial">Martial Arts</option>
-            </select>
-          </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <input id="name" placeholder="Exercise name" required style="flex:1" />
+          <select id="type" style="width:180px">
+            <option value="workout">Workout</option>
+            <option value="diet">Diet</option>
+            <option value="martial">Martial Arts</option>
+          </select>
         </div>
 
-        <div class="row">
-          <div class="col">
-            <label>Category</label>
-            <select id="exCategory" required></select>
-          </div>
-          <div class="col">
-            <label>Image / GIF URL</label>
-            <input id="exImage" type="text" placeholder="Paste image or gif URL (Drive sharing link or direct link)">
-          </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <select id="category" style="width:240px"></select>
+          <input id="image" placeholder="Image or GIF URL (Drive link okay)" style="flex:1" />
         </div>
 
-        <label>Description (optional)</label>
-        <textarea id="exDesc" rows="3" placeholder="Short description or notes"></textarea>
+        <textarea id="desc" rows="3" placeholder="Description (optional)"></textarea>
 
-        <div style="display:flex;gap:8px;align-items:center">
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button type="button" class="btn" id="reset">Reset</button>
           <button type="submit" class="btn primary">Add Exercise</button>
-          <button type="button" id="resetBtn" class="btn">Reset</button>
         </div>
       </form>
 
-      <div style="margin-top:12px">
-        <h3 style="margin:0 0 8px 0">Existing exercises</h3>
-        <div id="exerciseList" class="list"></div>
-      </div>
+      <div class="list" id="list"></div>
     </section>
   </div>
 
-<script>
-function normalizeImageUrl(url){
-  if(!url) return '';
-  url = url.trim();
-  const dmatch = url.match(/\/d\/([a-zA-Z0-9_-]{10,})/);
-  if(dmatch) return `https://drive.google.com/uc?export=view&id=${dmatch[1]}`;
-  const idParam = (new URLSearchParams(url.split('?')[1] || '')).get('id');
-  if(idParam) return `https://drive.google.com/uc?export=view&id=${idParam}`;
-  return url;
-}
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-analytics.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
 
-const CATEGORIES = {
+const firebaseConfig = {
+  apiKey: "AIzaSyAPrqqUbYzcPgFa34tKZvEB9IkT5yReJmw",
+  authDomain: "habitforge-185f6.firebaseapp.com",
+  projectId: "habitforge-185f6",
+  storageBucket: "habitforge-185f6.firebasestorage.app",
+  messagingSenderId: "23479259079",
+  appId: "1:23479259079:web:3681e77d6684adf636d3e2",
+  measurementId: "G-LP0P86N6LN"
+};
+const app = initializeApp(firebaseConfig);
+getAnalytics(app);
+const auth = getAuth();
+
+function localKey(k, uid){ return `${k}_${uid || 'guest'}`; }
+function getUid(){ return (auth.currentUser && auth.currentUser.uid) || 'guest'; }
+function loadArr(k){ try{return JSON.parse(localStorage.getItem(localKey(k,getUid())))||[];}catch(e){return []} }
+function saveArr(k,v){ localStorage.setItem(localKey(k,getUid()), JSON.stringify(v)); }
+
+const TYPE_CATS = {
   workout: ['Biceps','Triceps','Chest','Back','Abs','Legs','Shoulders','Cardio','Full Body','Mobility'],
   diet: ['Breakfast','Lunch','Dinner','Snack','Supplements','Hydration'],
-  martial: ['Striking','Grappling','Forms','Footwork','Conditioning','Drills'],
+  martial: ['Striking','Grappling','Forms','Footwork','Conditioning','Drills']
 };
 
-const exType = document.getElementById('exType');
-const exCategory = document.getElementById('exCategory');
-const exName = document.getElementById('exName');
-const exImage = document.getElementById('exImage');
-const exDesc = document.getElementById('exDesc');
-const adminForm = document.getElementById('adminForm');
-const exerciseList = document.getElementById('exerciseList');
-const resetBtn = document.getElementById('resetBtn');
+const form = document.getElementById('adminForm');
+const nameIn = document.getElementById('name');
+const typeSel = document.getElementById('type');
+const catSel = document.getElementById('category');
+const imageIn = document.getElementById('image');
+const descIn = document.getElementById('desc');
+const listDiv = document.getElementById('list');
+const resetBtn = document.getElementById('reset');
 
-function loadExercises(){ return JSON.parse(localStorage.getItem('habitforge_exercises') || '[]'); }
-function saveExercises(arr){ localStorage.setItem('habitforge_exercises', JSON.stringify(arr)); }
-
-function populateCategorySelect(type){
-  exCategory.innerHTML='';
-  (CATEGORIES[type] || []).forEach(c => { const opt=document.createElement('option'); opt.value=c; opt.textContent=c; exCategory.appendChild(opt); });
+function populateCats(type){
+  catSel.innerHTML='';
+  (TYPE_CATS[type]||[]).forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; catSel.appendChild(o); });
 }
 
-exType.addEventListener('change', ()=> populateCategorySelect(exType.value));
-adminForm.addEventListener('submit', (e)=> { e.preventDefault(); addExercise(); });
-
-function addExercise(){
-  const name = exName.value.trim();
-  const type = exType.value;
-  const category = exCategory.value || (CATEGORIES[type] && CATEGORIES[type][0]) || 'General';
-  const imageRaw = exImage.value.trim();
-  const image = normalizeImageUrl(imageRaw);
-  const desc = exDesc.value.trim();
-  if(!name) return alert('Provide exercise name');
-  const arr = loadExercises();
-  const newEx = { id:'ex_'+Date.now()+'_'+Math.floor(Math.random()*9999), name, type, category, image, desc };
-  arr.unshift(newEx); saveExercises(arr);
-  exName.value=''; exImage.value=''; exDesc.value='';
-  renderExerciseList(); alert('Exercise added ✓');
+function imageCandidates(url){
+  if(!url) return [''];
+  const out=[]; if(/^data:|https?:\/\/.+\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url)) out.push(url);
+  const m = url.match(/\/d\/([a-zA-Z0-9_-]{10,})/); if(m){ out.push(`https://drive.google.com/uc?export=view&id=${m[1]}`); out.push(`https://drive.google.com/thumbnail?id=${m[1]}`); }
+  try{ const u=new URL(url); const id=u.searchParams.get('id'); if(id) out.push(`https://drive.google.com/uc?export=view&id=${id}`); }catch(e){}
+  if(!out.includes(url)) out.push(url);
+  out.push('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><rect width="100%" height="100%" fill="%23eef2ff"/></svg>');
+  return out;
 }
 
-function renderExerciseList(){
-  const arr = loadExercises(); exerciseList.innerHTML='';
-  if(arr.length === 0){ exerciseList.innerHTML = '<div class="small">No exercises added yet.</div>'; return; }
-  arr.forEach(e=>{
-    const div=document.createElement('div'); div.className='item';
-    const img=document.createElement('img'); img.className='thumb'; img.src = e.image || '';
-    img.onerror = ()=> img.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="80"><rect width="100%" height="100%" fill="%23eef2ff"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%236b7280" font-family="Arial" font-size="12">No Image</text></svg>';
-    const info=document.createElement('div'); info.style.flex='1'; info.innerHTML = `<div style="font-weight:700">${e.name}</div><div class="small">${e.type} • ${e.category}</div><div class="small" style="margin-top:6px">${e.desc || ''}</div>`;
-    const del=document.createElement('button'); del.className='btn ghost'; del.textContent='Delete';
-    del.addEventListener('click', ()=> { if(confirm('Delete this exercise?')){ deleteExercise(e.id); }});
-    div.appendChild(img); div.appendChild(info); div.appendChild(del); exerciseList.appendChild(div);
+function renderList(){
+  const exs = loadArr('habitforge_exercises');
+  listDiv.innerHTML='';
+  if(exs.length===0){ listDiv.innerHTML = '<div class="small muted">No exercises yet.</div>'; return; }
+  exs.forEach(e=>{
+    const item = document.createElement('div'); item.className='item';
+    const img = document.createElement('img'); img.className='thumb';
+    const c = imageCandidates(e.image||''); let i=0; img.src=c[i]; img.onerror=()=>{ i++; if(i<c.length) img.src=c[i]; };
+    const info = document.createElement('div'); info.style.flex='1'; info.innerHTML = `<div style="font-weight:700">${e.name}</div><div class="small muted">${e.type} • ${e.category}</div><div class="small">${e.desc||''}</div>`;
+    const del = document.createElement('button'); del.className='btn'; del.textContent='Delete';
+    del.addEventListener('click', ()=>{
+      if(!confirm('Delete exercise?')) return;
+      const arr = loadArr('habitforge_exercises').filter(x=>x.id !== e.id);
+      saveArr('habitforge_exercises', arr); renderList();
+    });
+    item.appendChild(img); item.appendChild(info); item.appendChild(del);
+    listDiv.appendChild(item);
   });
 }
 
-function deleteExercise(id){
-  let arr = loadExercises(); arr = arr.filter(x => x.id !== id); saveExercises(arr); renderExerciseList(); alert('Deleted ✓');
-}
+typeSel.addEventListener('change', ()=> populateCats(typeSel.value));
+resetBtn.addEventListener('click', ()=> { form.reset(); populateCats(typeSel.value); });
 
-resetBtn.addEventListener('click', ()=> { exName.value=''; exImage.value=''; exDesc.value=''; exType.value='workout'; populateCategorySelect('workout'); });
+form.addEventListener('submit', (ev)=>{
+  ev.preventDefault();
+  const name = nameIn.value.trim();
+  const type = typeSel.value;
+  const category = catSel.value || (TYPE_CATS[type] && TYPE_CATS[type][0]) || 'General';
+  const image = imageIn.value.trim();
+  const desc = descIn.value.trim();
+  if(!name) return alert('Name required');
+  const arr = loadArr('habitforge_exercises');
+  const obj = { id:'ex_'+Date.now()+'_'+Math.floor(Math.random()*9999), name, type, category, image, desc };
+  arr.unshift(obj); saveArr('habitforge_exercises', arr);
+  form.reset(); populateCats(typeSel.value); renderList(); alert('Added');
+});
 
-populateCategorySelect(exType.value);
-renderExerciseList();
+/* keep auth-aware uid mapping (data saved under current user) */
+onAuthStateChanged(auth, user=>{
+  // when user changed, simply re-render using their namespace
+  renderList();
+});
+
+// init
+populateCats(typeSel.value);
+renderList();
 </script>
 </body>
 </html>
