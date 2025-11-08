@@ -7,128 +7,119 @@
 <title>HabitForge — Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-  /* Mobile-first professional styles (compact, readable) */
+  /* Mobile-first professional theme */
   :root{
     --bg:#F5F7FB; --surface:#ffffff; --muted:#6b7280; --text:#07122a;
-    --accent1:#2b6ef6; --accent2:#6a9cff; --success:#16a34a; --radius:12px;
-    --maxw:980px;
+    --accent1:#2b6ef6; --accent2:#6a9cff; --success:#16a34a; --danger:#ef4444;
+    --radius:12px; --shadow: 0 10px 30px rgba(12,18,36,0.06); --maxw:980px;
   }
-  body.dark{ --bg:#071226; --surface:#071226; --muted:#9aa4b2; --text:#e6eef9; }
+  body.dark{ --bg:#071226; --surface:#0b1522; --muted:#9aa4b2; --text:#e6eef9; --shadow: 0 18px 60px rgba(0,0,0,0.6); }
   *{box-sizing:border-box}
   html,body{height:100%}
-  body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;padding:12px;display:flex;justify-content:center}
+  body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto;background:var(--bg);color:var(--text);padding:12px;display:flex;justify-content:center;-webkit-font-smoothing:antialiased}
   .app{width:100%;max-width:var(--maxw);display:flex;flex-direction:column;gap:12px}
-  header.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:12px}
   .brand{display:flex;gap:12px;align-items:center}
-  .logo{width:46px;height:46px;border-radius:10px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:grid;place-items:center;color:white;font-weight:700}
+  .logo{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:grid;place-items:center;color:#fff;font-weight:800}
   .greet{display:flex;flex-direction:column}
-  .greet h1{margin:0;font-size:17px}
-  .greet p{margin:2px 0 0 0;color:var(--muted);font-size:13px}
+  .greet h1{margin:0;font-size:18px}
+  .greet p{margin:3px 0 0 0;color:var(--muted);font-size:13px}
   .controls{display:flex;gap:8px;align-items:center}
   .btn{border-radius:10px;padding:8px 10px;border:1px solid rgba(10,20,40,0.06);background:var(--surface);font-weight:700;cursor:pointer}
   .btn.primary{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#fff;border:0}
   .avatar{width:36px;height:36px;border-radius:999px;overflow:hidden;display:inline-block}
   .avatar img{width:100%;height:100%;object-fit:cover}
 
-  /* module selector */
-  .modules{display:flex;gap:8px;overflow:auto;padding:8px 0}
-  .module{min-width:120px;padding:10px;border-radius:12px;background:var(--surface);display:flex;gap:10px;align-items:center;border:1px solid rgba(10,20,40,0.04);cursor:pointer}
-  .module.active{box-shadow:0 10px 30px rgba(43,110,246,0.12);transform:translateY(-2px)}
+  .panel{background:var(--surface);padding:12px;border-radius:12px;border:1px solid rgba(10,20,40,0.04);box-shadow:var(--shadow)}
+  .modules{display:flex;gap:8px;overflow:auto;margin-top:10px}
+  .module{min-width:120px;padding:10px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.95),var(--surface));display:flex;gap:10px;align-items:center;border:1px solid rgba(10,20,40,0.04);cursor:pointer}
+  .module.active{box-shadow:0 14px 36px rgba(43,110,246,0.12);transform:translateY(-2px)}
 
-  /* grid: single column on phones, 2 columns on wider */
-  .panel{background:var(--surface);padding:12px;border-radius:12px;border:1px solid rgba(10,20,40,0.04)}
-  .cards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px}
+  .cards{display:grid;gap:12px;margin-top:12px;grid-template-columns:1fr}
   @media(min-width:640px){ .cards{grid-template-columns:repeat(2,1fr)} }
   @media(min-width:1000px){ .cards{grid-template-columns:repeat(3,1fr)} }
 
-  .card{border-radius:12px;overflow:hidden;border:1px solid rgba(10,20,40,0.04);display:flex;flex-direction:column;background:linear-gradient(180deg,#fff,#fbfdff);min-height:160px;cursor:pointer}
-  .thumb{aspect-ratio:16/9;width:100%;background:#eef2ff;position:relative}
+  .card{border-radius:12px;overflow:hidden;border:1px solid rgba(10,20,40,0.04);display:flex;flex-direction:column;background:linear-gradient(180deg,#fff,#fbfdff);min-height:160px;cursor:pointer;position:relative}
+  .thumb{aspect-ratio:16/9;background:#eef2ff;position:relative;display:block}
   .thumb img{width:100%;height:100%;object-fit:cover;display:block}
-  .thumb .label{position:absolute;left:8px;top:8px;background:rgba(0,0,0,0.6);color:#fff;padding:6px 8px;border-radius:8px;font-size:12px}
-  .body{padding:10px;display:flex;flex-direction:column;gap:8px;flex:1}
-  .title{font-weight:700;margin:0}
-  .meta{display:flex;justify-content:space-between;align-items:center;gap:8px;color:var(--muted);font-size:13px}
-  .done-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(22,163,74,0.12);opacity:0;transition:opacity .12s}
+  .thumb .chip{position:absolute;left:8px;top:8px;background:rgba(0,0,0,0.64);color:#fff;padding:6px 8px;border-radius:8px;font-size:12px}
+  .done-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg, rgba(22,163,74,0.12), rgba(22,163,74,0.05));opacity:0;transition:opacity .12s}
   .card.completed .done-overlay{opacity:1}
-  .card.completed .title{text-decoration:line-through}
+  .card-body{padding:10px;display:flex;flex-direction:column;gap:8px;flex:1}
+  .card-title{font-weight:800;margin:0}
+  .card-meta{display:flex;justify-content:space-between;color:var(--muted);font-size:13px}
+  .card-foot{display:flex;justify-content:flex-end;padding:10px;gap:8px}
 
-  footer{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;padding:6px 0}
-
-  /* small helpers */
   .small{font-size:13px;color:var(--muted)}
-  .muted{color:var(--muted)}
-  .icon{font-size:18px}
 
-  /* input adaptive */
-  input[type="text"], select{padding:10px;border-radius:10px;border:1px solid rgba(10,20,40,0.06);width:100%}
-
-  /* tiny bottom nav for phones */
-  .bottomnav{display:flex;gap:8px;justify-content:space-around;padding:10px 6px;background:var(--surface);border-radius:12px;border:1px solid rgba(10,20,40,0.04)}
+  /* bottom nav for phones */
+  .bottomnav{display:flex;gap:8px;justify-content:space-around;padding:8px;background:var(--surface);border-radius:12px;border:1px solid rgba(10,20,40,0.04)}
 </style>
 </head>
 <body>
-  <div class="app" id="app">
-    <header class="top">
+  <main class="app" id="app">
+    <div class="top">
       <div class="brand">
         <div class="logo" aria-hidden>HF</div>
         <div class="greet">
           <h1 id="greet">Hello, Guest</h1>
-          <p id="subg" class="small">Sign in to sync your plans</p>
+          <p id="sub" class="small">Sign in to sync your data</p>
         </div>
       </div>
-      <div class="controls" id="topControls">
-        <button class="btn" id="createPlanBtn">Create Plan</button>
-        <button class="btn" id="adminBtn">Admin</button>
+
+      <div class="controls" id="controls">
+        <button class="btn" id="btnCreate">Create Plan</button>
+        <button class="btn" id="btnAdmin">Admin</button>
         <div id="authArea"></div>
       </div>
-    </header>
+    </div>
 
-    <!-- module selector -->
-    <section class="panel" aria-label="Modules">
+    <section class="panel" aria-label="modules">
       <div style="display:flex;justify-content:space-between;align-items:center">
-        <div><strong>Modules</strong><div class="small muted">Tap to open</div></div>
-        <div class="small muted" id="todayLabel">—</div>
+        <div><strong>Modules</strong><div class="small">Tap to view today's items</div></div>
+        <div class="small" id="todayLabel">—</div>
       </div>
 
       <div class="modules" id="modules">
-        <div class="module" data-module="workout">🏋️‍♂️ <div style="font-weight:700;margin-left:6px">Workout</div></div>
-        <div class="module" data-module="diet">🍽️ <div style="font-weight:700;margin-left:6px">Diet</div></div>
-        <div class="module" data-module="martial">🥋 <div style="font-weight:700;margin-left:6px">Martial Arts</div></div>
+        <div class="module active" data-module="workout">🏋️‍♂️ <div style="margin-left:8px;font-weight:700">Workout</div></div>
+        <div class="module" data-module="diet">🍽️ <div style="margin-left:8px;font-weight:700">Diet</div></div>
+        <div class="module" data-module="martial">🥋 <div style="margin-left:8px;font-weight:700">Martial Arts</div></div>
       </div>
     </section>
 
-    <!-- cards -->
-    <section class="panel" aria-label="Today's plan">
+    <section class="panel">
       <div style="display:flex;justify-content:space-between;align-items:center">
-        <div><strong>Today's Plan</strong><div class="small muted" id="planCount">—</div></div>
+        <div><strong>Today's Plan</strong><div id="planCount" class="small">—</div></div>
         <div style="display:flex;gap:8px">
-          <button class="btn" id="refreshBtn">Refresh</button>
-          <button class="btn" id="themeBtn">Theme</button>
+          <button class="btn" id="btnRefresh">Refresh</button>
+          <button class="btn" id="btnTheme">Theme</button>
         </div>
       </div>
 
-      <div class="cards" id="cards" aria-live="polite"></div>
+      <div id="cards" class="cards" aria-live="polite"></div>
     </section>
 
-    <footer>
-      <div class="small muted">HabitForge — plan, track, repeat</div>
-      <div class="small muted">Local • Google Sign-In supported</div>
+    <footer style="display:flex;justify-content:space-between;align-items:center">
+      <div class="small">HabitForge — plan • track • repeat</div>
+      <div class="small">Firestore sync available</div>
     </footer>
 
-    <nav class="bottomnav" style="margin-top:8px">
+    <nav class="bottomnav">
       <button class="btn" id="navHome">Home</button>
-      <button class="btn" id="navCreate">Create</button>
-      <button class="btn" id="navAdmin">Admin</button>
+      <button class="btn" id="navCreate2">Create</button>
+      <button class="btn" id="navAdmin2">Admin</button>
     </nav>
-  </div>
+  </main>
 
-  <!-- Firebase initialisation + Auth -->
+  <!-- Firebase + app logic -->
   <script type="module">
-  // Firebase imports and config (you supplied)
+  // Firebase imports (modular v12)
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-analytics.js";
   import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+  import { getFirestore, collection, addDoc, setDoc, doc, getDocs, query, where, onSnapshot, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
+  // YOUR Firebase config (you provided earlier)
   const firebaseConfig = {
     apiKey: "AIzaSyAPrqqUbYzcPgFa34tKZvEB9IkT5yReJmw",
     authDomain: "habitforge-185f6.firebaseapp.com",
@@ -141,223 +132,287 @@
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
   const auth = getAuth();
+  const db = getFirestore();
 
-  /* ---------- namespacing helpers ---------- */
-  const localKey = (key, uid) => `${key}_${uid || 'guest'}`;
+  /* ---------- helpers ---------- */
+  const $ = (s, root=document) => root.querySelector(s);
+  const $$ = (s, root=document) => Array.from(root.querySelectorAll(s));
 
-  // storage helpers (per-user when signed in)
-  function loadRaw(k, uid) {
-    try { return JSON.parse(localStorage.getItem(localKey(k, uid))) || []; } catch(e){ return []; }
-  }
-  function saveRaw(k, v, uid) { localStorage.setItem(localKey(k, uid), JSON.stringify(v)); }
+  function localKey(key, uid='guest'){ return `${key}_${uid}`; }
+  function uid() { return auth.currentUser ? auth.currentUser.uid : 'guest'; }
 
-  /* ---------- utilities ---------- */
+  function loadLocal(key){ try{ return JSON.parse(localStorage.getItem(localKey(key, uid()))) || []; } catch(e){ return []; } }
+  function saveLocal(key, arr){ localStorage.setItem(localKey(key, uid()), JSON.stringify(arr)); }
+
   function todayIndex(){ const d = new Date(); return (d.getDay() + 6) % 7; } // Mon=0
   function dayName(i){ return ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][i] || ''; }
-  function todayISO(d=new Date()){ return d.toISOString().slice(0,10); }
+  function todayISO(){ return new Date().toISOString().slice(0,10); }
 
   function imageCandidates(url){
     if(!url) return [''];
-    url = url.trim();
-    const c = [];
-    if(/^data:|https?:\/\/.+\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url)) c.push(url);
+    const arr=[];
+    if(/^data:|https?:\/\/.+\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url)) arr.push(url);
     const m = url.match(/\/d\/([a-zA-Z0-9_-]{10,})/);
-    if(m){ c.push(`https://drive.google.com/uc?export=view&id=${m[1]}`); c.push(`https://drive.google.com/thumbnail?id=${m[1]}`); }
-    try { const u = new URL(url); const id = u.searchParams.get('id'); if(id) { c.push(`https://drive.google.com/uc?export=view&id=${id}`); } } catch(e){}
-    if(!c.includes(url)) c.push(url);
-    c.push('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><rect width="100%" height="100%" fill="%23eef2ff"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%236b7280" font-family="Arial" font-size="18">No Image</text></svg>');
-    return c;
+    if(m){ arr.push(`https://drive.google.com/uc?export=view&id=${m[1]}`); arr.push(`https://drive.google.com/thumbnail?id=${m[1]}`); }
+    try{ const u = new URL(url); const id = u.searchParams.get('id'); if(id) arr.push(`https://drive.google.com/uc?export=view&id=${id}`); }catch(e){}
+    if(!arr.includes(url)) arr.push(url);
+    arr.push('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><rect width="100%" height="100%" fill="%23eef2ff"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%236b7280" font-family="Arial" font-size="18">No Image</text></svg>');
+    return arr;
   }
 
-  /* ---------- UI elements ---------- */
-  const greetEl = document.getElementById('greet');
-  const subg = document.getElementById('subg');
-  const authArea = document.getElementById('authArea');
-  const modulesEls = document.querySelectorAll('.module');
-  const cardsEl = document.getElementById('cards');
-  const planCountEl = document.getElementById('planCount');
-  const todayLabel = document.getElementById('todayLabel');
+  /* ---------- DOM refs ---------- */
+  const greet = $('#greet'), sub = $('#sub'), authArea = $('#authArea');
+  const modules = $$('#modules .module');
+  const cards = $('#cards'), planCount = $('#planCount'), todayLabel = $('#todayLabel');
+  const btnCreate = $('#btnCreate'), btnAdmin = $('#btnAdmin');
+  const navCreate = $('#navCreate'), navAdmin = $('#navAdmin2'), navCreate2 = $('#navCreate2');
+  const btnRefresh = $('#btnRefresh'), btnTheme = $('#btnTheme');
 
-  const createPlanBtn = document.getElementById('createPlanBtn');
-  const adminBtn = document.getElementById('adminBtn');
-  const navCreate = document.getElementById('navCreate');
-  const navAdmin = document.getElementById('navAdmin');
-  const refreshBtn = document.getElementById('refreshBtn');
-  const themeBtn = document.getElementById('themeBtn');
-  const themePrefKey = 'habitforge_theme';
-  let currentUid = null;
-  let currentUser = null;
-  let activeModule = 'workout';
+  /* ---------- navigation wiring ---------- */
+  btnCreate.addEventListener('click', ()=> location.href='create-plan.html');
+  btnAdmin.addEventListener('click', ()=> location.href='admin.html');
+  navCreate.addEventListener('click', ()=> location.href='create-plan.html');
+  navAdmin.addEventListener('click', ()=> location.href='admin.html');
+  navCreate2.addEventListener('click', ()=> location.href='create-plan.html');
 
-  /* ---------- routing helpers (open pages) ---------- */
-  createPlanBtn.addEventListener('click', ()=> location.href = 'create-plan.html');
-  adminBtn.addEventListener('click', ()=> location.href = 'admin.html');
-  navCreate.addEventListener('click', ()=> location.href = 'create-plan.html');
-  navAdmin.addEventListener('click', ()=> location.href = 'admin.html');
-
-  /* ---------- auth UI and handlers ---------- */
-  function renderAuthArea(user){
-    authArea.innerHTML = '';
-    if(user){
-      currentUid = user.uid;
-      currentUser = user;
-      const avatar = document.createElement('div'); avatar.className='avatar'; const img = document.createElement('img'); img.src = user.photoURL || ''; avatar.appendChild(img);
-      const nameBtn = document.createElement('button'); nameBtn.className='btn'; nameBtn.textContent = user.displayName || 'User';
-      const outBtn = document.createElement('button'); outBtn.className='btn'; outBtn.textContent='Sign out';
-      outBtn.addEventListener('click', ()=> signOut(auth).then(()=>{/*signed out*/}).catch(()=>{}));
-      authArea.appendChild(avatar); authArea.appendChild(nameBtn); authArea.appendChild(outBtn);
-      greetEl.textContent = `Hello, ${user.displayName || 'User'}`;
-      subg.textContent = 'Signed in';
-    } else {
-      currentUid = null;
-      currentUser = null;
-      const signBtn = document.createElement('button'); signBtn.className='btn primary'; signBtn.textContent='Sign in with Google';
-      signBtn.addEventListener('click', googleSignIn);
-      authArea.appendChild(signBtn);
-      greetEl.textContent = 'Hello, Guest';
-      subg.textContent = 'Sign in to sync your plans';
-    }
-    renderGrid(); // refresh with user namespace
-  }
-
+  /* ---------- auth UI & handlers ---------- */
   const provider = new GoogleAuthProvider();
-  async function googleSignIn(){
+
+  async function showSignIn(){
     try {
       await signInWithPopup(auth, provider);
-      // onAuthStateChanged will handle UI update
+      // onAuthStateChanged will update UI
     } catch(err){
       alert('Sign-in failed: ' + (err.message || err));
     }
   }
 
-  onAuthStateChanged(auth, (user) => {
-    renderAuthArea(user);
-  });
-
-  /* ---------- theme ---------- */
-  function applyTheme(t){
-    if(!t) t = localStorage.getItem(themePrefKey) || 'light';
-    if(t === 'dark') document.body.classList.add('dark'); else document.body.classList.remove('dark');
-    localStorage.setItem(themePrefKey, t);
+  function renderAuth(user){
+    authArea.innerHTML = '';
+    if(user){
+      const avatar = document.createElement('div'); avatar.className='avatar'; const img = document.createElement('img'); img.src = user.photoURL || ''; avatar.appendChild(img);
+      const nameBtn = document.createElement('button'); nameBtn.className='btn'; nameBtn.textContent = user.displayName || 'User';
+      const outBtn = document.createElement('button'); outBtn.className='btn'; outBtn.textContent='Sign out';
+      outBtn.addEventListener('click', ()=> signOut(auth));
+      authArea.appendChild(avatar); authArea.appendChild(nameBtn); authArea.appendChild(outBtn);
+      greet.textContent = `Hello, ${user.displayName || 'User'}`;
+      sub.textContent = 'Signed in — data saved to Firestore';
+    } else {
+      const signBtn = document.createElement('button'); signBtn.className='btn primary'; signBtn.textContent='Sign in with Google';
+      signBtn.addEventListener('click', showSignIn);
+      authArea.appendChild(signBtn);
+      greet.textContent = 'Hello, Guest';
+      sub.textContent = 'Sign in to sync your data (or continue locally)';
+    }
   }
-  themeBtn.addEventListener('click', ()=>{
-    const now = document.body.classList.contains('dark') ? 'light' : 'dark';
-    applyTheme(now);
-  });
-  applyTheme(localStorage.getItem(themePrefKey));
 
-  /* ---------- data layer helpers (per-user when signed in) ---------- */
-  function key(k){ return localKey(k, currentUid); }
-  function localKey(k, uid){ return `${k}_${uid || 'guest'}`; }
+  /* ---------- Firestore helpers ----------
+     Save & load functions:
+     - Collection per-user: users/{uid}/exercises and users/{uid}/plans
+     We'll also keep local copies to permit offline use.
+  --------------------------------------------------- */
 
-  function loadArr(k){ try { return JSON.parse(localStorage.getItem(key(k))) || []; } catch(e){ return []; } }
-  function saveArr(k, arr){ localStorage.setItem(key(k), JSON.stringify(arr)); }
+  // Write a plan to Firestore and local storage
+  async function savePlan(plan){
+    // plan has: id, exerciseId, exerciseSnapshot, days[], addedAt
+    const uid = auth.currentUser ? auth.currentUser.uid : null;
+    // save locally first (optimistic)
+    const local = loadLocal('habitforge_plans') || [];
+    const existing = local.find(p=>p.id === plan.id);
+    if(existing) {
+      local.splice(local.indexOf(existing),1,plan);
+    } else local.push(plan);
+    saveLocal('habitforge_plans', local);
 
-  // convenient getters
-  function getExercises(){ return loadArr('habitforge_exercises'); }
-  function getPlans(){ return loadArr('habitforge_plans'); }
+    if(uid){
+      try {
+        // setDoc at users/{uid}/plans/{plan.id}
+        const docRef = doc(db, 'users', uid, 'plans', plan.id);
+        await setDoc(docRef, { ...plan, uid, updatedAt: Date.now() });
+      } catch(e){
+        console.error('Firestore savePlan failed', e);
+      }
+    }
+  }
 
-  /* ---------- render grid (today's plans filtered by module and day) ---------- */
+  async function deletePlan(planId){
+    const uid = auth.currentUser ? auth.currentUser.uid : null;
+    // delete locally
+    const local = loadLocal('habitforge_plans') || [];
+    const next = local.filter(p => p.id !== planId);
+    saveLocal('habitforge_plans', next);
+    // delete in Firestore if signed in
+    if(uid){
+      try { await deleteDoc(doc(db, 'users', uid, 'plans', planId)); } catch(e){ console.warn('deletePlan failed', e); }
+    }
+  }
+
+  async function loadUserDataToLocal(){
+    // pull Firestore user data into localStorage for offline-first UI
+    const u = auth.currentUser;
+    if(!u) return;
+    try {
+      const exSnap = await getDocs(collection(db, 'users', u.uid, 'exercises'));
+      const plansSnap = await getDocs(collection(db, 'users', u.uid, 'plans'));
+      const exercises = exSnap.docs.map(d => d.data());
+      const plans = plansSnap.docs.map(d => d.data());
+      saveLocal('habitforge_exercises', exercises);
+      saveLocal('habitforge_plans', plans);
+    } catch(e){ console.warn('loadUserDataToLocal failed', e); }
+  }
+
+  // listen for remote changes (optional): start snapshot listeners after auth
+  let exerciseUnsub = null, planUnsub = null;
+  function startRealtimeListenersFor(uid){
+    if(exerciseUnsub) exerciseUnsub();
+    if(planUnsub) planUnsub();
+    exerciseUnsub = onSnapshot(collection(db, 'users', uid, 'exercises'), snap => {
+      const arr = snap.docs.map(d => d.data());
+      saveLocal('habitforge_exercises', arr);
+      renderGrid();
+    }, err => console.warn('exercise listener', err));
+    planUnsub = onSnapshot(collection(db, 'users', uid, 'plans'), snap => {
+      const arr = snap.docs.map(d => d.data());
+      saveLocal('habitforge_plans', arr);
+      renderGrid();
+    }, err => console.warn('plan listener', err));
+  }
+
+  /* ---------- UI rendering & interactions ---------- */
+
+  function loadLocal(key){ try{ return JSON.parse(localStorage.getItem(localKey(key, uid()))) || []; }catch(e){ return []; } }
+  function saveLocal(key, arr){ localStorage.setItem(localKey(key, uid()), JSON.stringify(arr)); }
+  function localKey(key, u){ return `${key}_${u||'guest'}`; }
+
+  function getExercises(){ return loadLocal('habitforge_exercises'); }
+  function getPlans(){ return loadLocal('habitforge_plans'); }
+
+  // Toggle done state stored locally (per-user) as habitforge_done_{uid}
+  function getDoneMap(){ try{ return JSON.parse(localStorage.getItem(localKey('habitforge_done', uid()))) || {}; }catch(e){ return {}; } }
+  function saveDoneMap(m){ localStorage.setItem(localKey('habitforge_done', uid()), JSON.stringify(m)); }
+
   function renderGrid(){
-    cardsEl.innerHTML = '';
+    cards.innerHTML = '';
+    const mod = Array.from($$('#modules .module')).find(m => m.classList.contains('active'))?.dataset.module || 'workout';
     const plans = getPlans();
     const exercises = getExercises();
-    const todayIdx = todayIndex();
-    todayLabel.textContent = `${dayName(todayIdx)} • ${new Date().toLocaleDateString()}`;
+    const today = todayIndex();
+    todayLabel.textContent = `${dayName(today)} • ${new Date().toLocaleDateString()}`;
+    const todays = plans.filter(p => (p.exerciseSnapshot?.type || p.type) === mod && Array.isArray(p.days) && p.days.includes(today));
+    planCount.textContent = `${todays.length} item${todays.length!==1?'s':''}`;
 
-    const todayPlans = plans.filter(p => {
-      const t = (p.exerciseSnapshot && p.exerciseSnapshot.type) || '';
-      return t === activeModule && Array.isArray(p.days) && p.days.includes(todayIdx);
-    });
-
-    planCountEl.textContent = `${todayPlans.length} item${todayPlans.length !== 1 ? 's' : ''}`;
-
-    if(todayPlans.length === 0){
-      const empty = document.createElement('div'); empty.className='small muted'; empty.textContent = 'No items planned for this module today. Use Create Plan.';
-      cardsEl.appendChild(empty); return;
+    if(todays.length === 0) {
+      cards.innerHTML = `<div class="small">No items planned for ${mod} today. Use Create Plan.</div>`;
+      return;
     }
 
-    // done map structure: { planId: { 'YYYY-MM-DD': true } }
-    const doneMap = JSON.parse(localStorage.getItem(localKey('habitforge_done', currentUid)) || '{}');
-
-    todayPlans.forEach(p => {
-      const ex = p.exerciseSnapshot || exercises.find(e => e.id === p.exerciseId) || {};
+    const doneMap = getDoneMap();
+    for(const p of todays){
+      const ex = p.exerciseSnapshot || exercises.find(e=>e.id===p.exerciseId) || {};
       const card = document.createElement('article'); card.className='card';
-      // completed?
-      const today = todayISO();
-      const completed = !!(doneMap[p.id] && doneMap[p.id][today]);
-      if(completed) card.classList.add('completed');
+      const done = !!(doneMap[p.id] && doneMap[p.id][todayISO()]);
+      if(done) card.classList.add('completed');
 
-      // thumb
-      const thumb = document.createElement('div'); thumb.className='thumb';
+      // thumbnail
+      const th = document.createElement('div'); th.className='thumb';
       const img = document.createElement('img'); img.alt = ex.name || '';
       const cands = imageCandidates(ex.image || '');
-      let i = 0; img.src = cands[i];
-      img.onerror = ()=> { i++; if(i < cands.length) img.src = cands[i]; };
-      thumb.appendChild(img);
-      const label = document.createElement('div'); label.className='label'; label.textContent = ex.category || (ex.type || activeModule); thumb.appendChild(label);
-      const doneOverlay = document.createElement('div'); doneOverlay.className='done-overlay'; doneOverlay.innerHTML = '<div style="padding:10px;border-radius:999px;background:#16a34a;color:#fff;font-weight:800">✓ Done</div>'; thumb.appendChild(doneOverlay);
+      let i=0; img.src = cands[i]; img.onerror = ()=>{ i++; if(i<cands.length) img.src = cands[i]; };
+      th.appendChild(img);
+      const chip = document.createElement('div'); chip.className='chip'; chip.textContent = ex.category || ex.type || mod; th.appendChild(chip);
+      const overlay = document.createElement('div'); overlay.className='done-overlay'; overlay.innerHTML = `<div style="padding:10px;border-radius:999px;background:var(--success);color:#fff;font-weight:800">✓ Done</div>`; th.appendChild(overlay);
 
       // body
-      const body = document.createElement('div'); body.className='body';
-      const title = document.createElement('div'); title.className='title'; title.textContent = ex.name || 'Unnamed';
-      const meta = document.createElement('div'); meta.className='meta';
-      meta.innerHTML = `<div class="small muted">${ex.type || activeModule}</div><div class="small muted">${(p.days || []).map(d=>dayName(d)).join(', ')}</div>`;
+      const body = document.createElement('div'); body.className='card-body';
+      const title = document.createElement('div'); title.className='card-title'; title.textContent = ex.name || 'Unnamed';
+      const meta = document.createElement('div'); meta.className='card-meta'; meta.innerHTML = `<div class="small">${ex.type || mod}</div><div class="small">${(p.days||[]).map(d=>dayName(d)).join(', ')}</div>`;
       body.appendChild(title); body.appendChild(meta);
 
-      // footer actions
-      const footer = document.createElement('div'); footer.className='card-foot';
-      const removeBtn = document.createElement('button'); removeBtn.className='btn'; removeBtn.textContent='Remove';
-      removeBtn.addEventListener('click', (ev)=>{
-        ev.stopPropagation();
-        if(!confirm('Remove from plan?')) return;
-        const newPlans = getPlans().filter(pp => pp.id !== p.id);
-        saveArr('habitforge_plans', newPlans);
-        renderGrid();
-      });
-      footer.appendChild(removeBtn);
+      const foot = document.createElement('div'); foot.className='card-foot';
+      const remove = document.createElement('button'); remove.className='btn'; remove.textContent='Remove';
+      remove.addEventListener('click', (ev)=>{ ev.stopPropagation(); if(confirm('Remove from plan?')) deletePlan(p.id); });
+      foot.appendChild(remove);
 
-      card.appendChild(thumb); card.appendChild(body); card.appendChild(footer);
-
-      card.addEventListener('click', ()=>{
-        const dm = JSON.parse(localStorage.getItem(localKey('habitforge_done', currentUid)) || '{}');
-        dm[p.id] = dm[p.id] || {};
-        if(dm[p.id][today]) delete dm[p.id][today]; else dm[p.id][today] = true;
-        if(dm[p.id] && Object.keys(dm[p.id]).length === 0) delete dm[p.id];
-        localStorage.setItem(localKey('habitforge_done', currentUid), JSON.stringify(dm));
+      card.appendChild(th); card.appendChild(body); card.appendChild(foot);
+      card.addEventListener('click', () => {
+        const map = getDoneMap();
+        const t = todayISO();
+        map[p.id] = map[p.id] || {};
+        if(map[p.id][t]) delete map[p.id][t]; else map[p.id][t] = true;
+        if(map[p.id] && Object.keys(map[p.id]).length===0) delete map[p.id];
+        saveDoneMap(map);
         card.classList.toggle('completed');
       });
 
-      cardsEl.appendChild(card);
-    });
+      cards.appendChild(card);
+    }
   }
 
-  /* ---------- UI wiring ---------- */
-  modulesEls.forEach(el => el.addEventListener('click', ()=>{
-    modulesEls.forEach(x => x.classList.remove('active'));
+  // module switching
+  $$('#modules .module').forEach(el => { el.addEventListener('click', ()=> {
+    $$('#modules .module').forEach(x=>x.classList.remove('active'));
     el.classList.add('active');
-    activeModule = el.dataset.module;
     renderGrid();
-  }));
+  })});
 
-  refreshBtn.addEventListener('click', renderGrid);
+  // theme toggle
+  btnTheme.addEventListener('click', ()=>{
+    const t = document.body.classList.contains('dark') ? 'light' : 'dark';
+    if(t==='dark') document.body.classList.add('dark'); else document.body.classList.remove('dark');
+    localStorage.setItem('habitforge_theme', t);
+  });
+  // apply saved theme
+  const savedTheme = localStorage.getItem('habitforge_theme') || 'light';
+  if(savedTheme === 'dark') document.body.classList.add('dark');
 
-  // set initial active module (from last used stats or default)
-  (function initModule(){
-    const stats = JSON.parse(localStorage.getItem(localKey('habitforge_stats', currentUid)) || '{}');
-    const last = stats.lastModule || 'workout';
-    const el = Array.from(modulesEls).find(m => m.dataset.module === last) || modulesEls[0];
-    el.classList.add('active'); activeModule = el.dataset.module;
+  // refresh
+  btnRefresh.addEventListener('click', renderGrid);
+
+  /* ---------- Firestore sync orchestration ----------
+     - When user signs in: load firestore into localStorage and start realtime listeners.
+     - When user signs out: stop listeners (handled by library when unsubscribing).
+  --------------------------------------------------- */
+  onAuthStateChanged(auth, async user => {
+    renderAuth(user);
+    if(user){
+      // load remote into local and start listeners
+      await loadUserDataToLocal();
+      startRealtimeListenersFor(user.uid);
+    } else {
+      // no user: stop realtime listeners
+      if(typeof exerciseUnsub === 'function'){ exerciseUnsub(); exerciseUnsub = null; }
+      if(typeof planUnsub === 'function'){ planUnsub(); planUnsub = null; }
+    }
+    renderGrid();
+  });
+
+  // expose some debug helpers on window for testing
+  window._hf = {
+    savePlan, deletePlan, renderGrid, loadUserDataToLocal
+  };
+
+  // init local seed if empty (non-destructive)
+  (function seedIfEmpty(){
+    const exKey = localKey('habitforge_exercises', uid());
+    const plKey = localKey('habitforge_plans', uid());
+    if(!localStorage.getItem(exKey)){
+      const seedEx = [
+        { id:'ex_push_1', name:'Push-ups', type:'workout', category:'Chest', image:'' },
+        { id:'ex_squat_1', name:'Squats', type:'workout', category:'Legs', image:'' },
+        { id:'ex_meal_1', name:'Protein Shake', type:'diet', category:'Snack', image:'' },
+        { id:'ex_shadow_1', name:'Shadow Boxing', type:'martial', category:'Striking', image:'' }
+      ];
+      localStorage.setItem(exKey, JSON.stringify(seedEx));
+    }
+    if(!localStorage.getItem(plKey)){
+      const seedPlan = [
+        { id:'p_seed_1', exerciseId:'ex_push_1', exerciseSnapshot:{id:'ex_push_1', name:'Push-ups', type:'workout', category:'Chest', image:''}, days:[todayIndex()], addedAt:Date.now() }
+      ];
+      localStorage.setItem(plKey, JSON.stringify(seedPlan));
+    }
+    renderGrid();
   })();
 
-  /* ---------- navigation: open create-plan/admin pages (they will share auth) ---------- */
-  // handled above with link buttons
-
-  /* ---------- initial render and auth area update ---------- */
-  renderAuthArea(null); // shows sign-in button while waiting
-  renderGrid();
-
-  // update auth area when auth changes is handled by onAuthStateChanged above (renderAuthArea)
   </script>
 </body>
 </html>
