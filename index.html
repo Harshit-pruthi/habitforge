@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+<title>HabitForge — Dashboard (Pro Grid)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #f6f8fb;
+    --card: #ffffff;
+    --muted: #6b7280;
+    --text: #0b132b;
+    --accent-from:#2b6ef6; --accent-to:#6a9cff;
+    --chip:#eef2ff;
+    --ok:#16a34a;
+    --border: rgba(10,20,50,0.08);
+    --shadow: 0 14px 40px rgba(12,18,36,0.08);
+    --radius:14px;
+  }
+  body.dark{
+    --bg:#0b1220; --card:#0e1a2a; --muted:#9aa4b2; --text:#e6eef9; --chip:#17243a; --border: rgba(255,255,255,0.06);
+    --shadow: 0 18px 50px rgba(0,0,0,0.45);
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+    background:
+      radial-gradient(900px 360px at 8% 8%, rgba(43,110,246,0.05), transparent 20%),
+      radial-gradient(700px 300px at 95% 95%, rgba(43,110,246,0.03), transparent 18%),
+      var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    padding:18px;
+    display:flex; justify-content:center;
+  }
+
+  .wrap{width:100%;max-width:1200px;display:flex;flex-direction:column;gap:16px}
+
+  /* Header */
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .brand{display:flex;gap:12px;align-items:center}
+  .logo{width:52px;height:52px;border-radius:12px;display:grid;place-items:center;color:white;font-weight:700;font-size:18px;background:linear-gradient(135deg,var(--accent-from),var(--accent-to));box-shadow:var(--shadow)}
+  .greeting h1{margin:0;font-size:20px;letter-spacing:.2px}
+  .greeting p{margin:2px 0 0 0;color:var(--muted);font-size:13px}
+  .actions{display:flex;gap:10px;align-items:center}
+  .btn{border:1px solid var(--border);background:transparent;color:var(--text);padding:10px 12px;border-radius:10px;font-weight:600;cursor:pointer}
+  .btn.primary{background:linear-gradient(90deg,var(--accent-from),var(--accent-to));border:none;color:#fff;box-shadow:0 10px 24px rgba(43,110,246,0.18)}
+  .toggle{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1px solid var(--border);cursor:pointer}
+
+  /* Modules row */
+  .modules-card{background:var(--card);border-radius:14px;padding:14px;box-shadow:var(--shadow);border:1px solid var(--border)}
+  .modules{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
+  .module{flex:1;min-width:200px;padding:12px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.85),rgba(250,250,255,0.97));display:flex;gap:12px;align-items:center;cursor:pointer;border:1px solid var(--border);transition:transform .12s, box-shadow .12s}
+  body.dark .module{background:linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.03))}
+  .module:active{transform:translateY(2px)}
+  .module.active{box-shadow:0 14px 30px rgba(43,110,246,0.18)}
+  .module .icon{width:52px;height:52px;border-radius:10px;display:grid;place-items:center;background:rgba(255,255,255,0.9);box-shadow:0 8px 18px rgba(7,18,42,0.06)}
+  body.dark .module .icon{background:rgba(255,255,255,0.06)}
+  .module h3{margin:0 0 2px 0;font-size:15px}
+  .module p{margin:0;color:var(--muted);font-size:13px}
+
+  /* Grid section */
+  .grid-card{background:var(--card);border-radius:14px;padding:14px;box-shadow:var(--shadow);border:1px solid var(--border)}
+  .grid-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .small{font-size:13px;color:var(--muted)}
+  #todayLabel{white-space:nowrap}
+
+  .cards{
+    margin-top:14px;
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap:14px;
+  }
+
+  .card{
+    border:1px solid var(--border);
+    border-radius:14px;
+    overflow:hidden;
+    background:linear-gradient(180deg,#fff,#fbfdff);
+    box-shadow:0 6px 18px rgba(12,18,36,0.06);
+    transition:transform .12s, box-shadow .12s;
+    cursor:pointer;
+    display:flex;flex-direction:column;
+  }
+  body.dark .card{background:linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))}
+  .card:hover{transform:translateY(-2px); box-shadow:0 16px 36px rgba(12,18,36,0.14)}
+  .thumb{
+    position:relative;
+    background:#e5e9f5;
+    aspect-ratio:16/9;
+    overflow:hidden;
+  }
+  .thumb img{
+    width:100%; height:100%; object-fit:cover; display:block;
+    transform:translateZ(0);
+  }
+  .thumb .status{
+    position:absolute; top:10px; left:10px;
+    background:rgba(0,0,0,0.65); color:#fff; padding:4px 8px; border-radius:8px; font-size:12px; backdrop-filter: blur(8px);
+  }
+  .thumb .done{
+    position:absolute; inset:0; background:rgba(22,163,74,0.16);
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; transition:opacity .16s ease;
+  }
+  .card.completed .thumb .done{opacity:1}
+  .card.completed{opacity:0.82}
+  .card.completed .title{text-decoration:line-through}
+
+  .body{padding:10px 12px 12px}
+  .title{font-weight:700; font-size:15px; line-height:1.25; margin:0}
+  .meta-row{display:flex; gap:8px; align-items:center; margin-top:8px; flex-wrap:wrap}
+  .chip{font-size:12px; padding:6px 8px; border-radius:999px; background:var(--chip); border:1px solid var(--border)}
+  .days{font-size:12px; color:var(--muted)}
+
+  .foot{
+    display:flex; gap:8px; justify-content:flex-end; padding:10px 12px 12px;
+  }
+  .btn.ghost{background:transparent}
+
+  /* Skeleton for lazy images */
+  .skeleton{
+    background: linear-gradient(90deg, rgba(0,0,0,0.04) 25%, rgba(0,0,0,0.08) 37%, rgba(0,0,0,0.04) 63%);
+    background-size: 400% 100%;
+    animation: shimmer 1.2s infinite;
+  }
+  @keyframes shimmer{ 0%{background-position: 100% 0} 100%{background-position: -100% 0} }
+
+  /* Responsive tweaks */
+  @media (max-width:900px){
+    .module{min-width:unset}
+  }
+</style>
+</head>
+<body>
+  <div class="wrap" role="application" aria-label="HabitForge dashboard">
+    <header>
+      <div class="brand">
+        <div class="logo">HF</div>
+        <div class="greeting">
+          <h1 id="greet">Hello, User</h1>
+          <p class="small">Plan-driven habits • Tap a card to mark done</p>
+        </div>
+      </div>
+
+      <div class="actions" role="toolbar" aria-label="Top actions">
+        <button class="btn" id="editNameBtn" title="Change name">Edit Name</button>
+        <a class="btn" href="create-plan.html" title="Create / Manage Plan">Create Plan</a>
+        <a class="btn" href="admin.html" title="Admin">Admin</a>
+        <div id="darkToggle" class="toggle" role="switch" aria-checked="false">🌙 <span class="small">Dark</span></div>
+      </div>
+    </header>
+
+    <!-- Modules -->
+    <section class="modules-card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><strong>Modules</strong><div class="small">Choose a category to see today’s plan</div></div>
+        <div class="small">Local • v1.1</div>
+      </div>
+
+      <div class="modules" id="modules">
+        <div class="module" data-module="workout" tabindex="0">
+          <div class="icon" aria-hidden>🏋️‍♂️</div>
+          <div><h3>Workout</h3><p class="small">Strength & cardio</p></div>
+        </div>
+        <div class="module" data-module="diet" tabindex="0">
+          <div class="icon" aria-hidden>🍽️</div>
+          <div><h3>Diet</h3><p class="small">Meals & nutrition</p></div>
+        </div>
+        <div class="module" data-module="martial" tabindex="0">
+          <div class="icon" aria-hidden>🥋</div>
+          <div><h3>Martial Arts</h3><p class="small">Drills & technique</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Grid -->
+    <section class="grid-card">
+      <div class="grid-head">
+        <div>
+          <h2 style="margin:0">Today</h2>
+          <div class="small" id="subHead">Select a module to show cards</div>
+        </div>
+        <div class="small" id="todayLabel">—</div>
+      </div>
+
+      <div class="cards" id="cards"></div>
+
+      <div class="foot" style="justify-content:flex-end">
+        <button class="btn" id="refreshBtn">Refresh</button>
+        <button class="btn" id="clearDataBtn">Clear Data</button>
+      </div>
+    </section>
+  </div>
+
+<script>
+/* ========= Utilities & storage ========= */
+function loadExercises(){ return JSON.parse(localStorage.getItem('habitforge_exercises') || '[]'); }
+function loadPlans(){ return JSON.parse(localStorage.getItem('habitforge_plans') || '[]'); }
+function loadDone(){ return JSON.parse(localStorage.getItem('habitforge_done') || '{}'); }
+function saveDone(m){ localStorage.setItem('habitforge_done', JSON.stringify(m)); }
+function loadName(){ return localStorage.getItem('habitforge_user_name') || ''; }
+function saveName(n){ localStorage.setItem('habitforge_user_name', n || ''); }
+function loadTheme(){ return localStorage.getItem('habitforge_theme') || 'light'; }
+function saveTheme(t){ localStorage.setItem('habitforge_theme', t); }
+
+function yyyy_mm_dd(d = new Date()){
+  const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+function todayIndex(){ const js = new Date().getDay(); return (js + 6) % 7; } // Mon=0
+function dayName(i){ return ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][i] || ''; }
+function cap(s){ return s ? s[0].toUpperCase()+s.slice(1) : ''; }
+
+/* Robust Google Drive + generic image candidates */
+function imageCandidates(url){
+  if(!url) return [''];
+  url = url.trim();
+  const out=[];
+  if(/^data:|https?:\/\/.+\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url)) out.push(url);
+
+  const dmatch = url.match(/\/d\/([a-zA-Z0-9_-]{10,})/);
+  if(dmatch){
+    out.push(`https://drive.google.com/uc?export=view&id=${dmatch[1]}`);
+    out.push(`https://drive.google.com/thumbnail?id=${dmatch[1]}`);
+    out.push(`https://drive.google.com/uc?export=download&id=${dmatch[1]}`);
+  }
+  try{
+    const u = new URL(url, location.href); const id = u.searchParams.get('id');
+    if(id){
+      out.push(`https://drive.google.com/uc?export=view&id=${id}`);
+      out.push(`https://drive.google.com/thumbnail?id=${id}`);
+    }
+  }catch(e){}
+
+  if(!out.includes(url)) out.push(url);
+  out.push('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><rect width="100%" height="100%" fill="%23e6ebff"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%236b7280" font-family="Arial" font-size="18">No Image</text></svg>');
+  return out;
+}
+
+/* ========= DOM refs ========= */
+const greetEl = document.getElementById('greet');
+const modulesEls = document.querySelectorAll('.module');
+const cardsEl = document.getElementById('cards');
+const todayLabel = document.getElementById('todayLabel');
+const subHead = document.getElementById('subHead');
+const darkToggle = document.getElementById('darkToggle');
+const editNameBtn = document.getElementById('editNameBtn');
+const refreshBtn = document.getElementById('refreshBtn');
+const clearDataBtn = document.getElementById('clearDataBtn');
+
+let activeModule = null;
+
+/* ========= Theme & name ========= */
+function applyTheme(){
+  const t = loadTheme();
+  if(t === 'dark'){ document.body.classList.add('dark'); darkToggle.setAttribute('aria-checked','true'); darkToggle.innerHTML = '🌙 <span class="small">Dark</span>'; }
+  else { document.body.classList.remove('dark'); darkToggle.setAttribute('aria-checked','false'); darkToggle.innerHTML = '☀️ <span class="small">Light</span>'; }
+}
+darkToggle.addEventListener('click', ()=> { const next = document.body.classList.contains('dark') ? 'light' : 'dark'; saveTheme(next); applyTheme(); });
+
+function applyName(){ greetEl.textContent = `Hello, ${loadName() || 'User'}`; }
+editNameBtn.addEventListener('click', ()=>{
+  const v = prompt('Enter your name', loadName() || '');
+  if(v !== null){ saveName(v.trim()); applyName(); }
+});
+
+/* ========= Module switching ========= */
+modulesEls.forEach(el=>{
+  el.addEventListener('click', ()=> openModule(el.dataset.module));
+  el.addEventListener('keydown', (e)=> { if(e.key === 'Enter') openModule(el.dataset.module); });
+});
+function openModule(key){
+  activeModule = key;
+  modulesEls.forEach(m => m.classList.toggle('active', m.dataset.module === key));
+  subHead.textContent = `Showing ${cap(key)} planned for today`;
+  renderGrid();
+}
+
+/* ========= Done map ========= */
+function isDoneToday(planId){
+  const map = loadDone(); const t = yyyy_mm_dd();
+  return !!(map[planId] && map[planId][t]);
+}
+function toggleDoneToday(planId){
+  const map = loadDone(); const t = yyyy_mm_dd();
+  map[planId] = map[planId] || {};
+  if(map[planId][t]) delete map[planId][t];
+  else map[planId][t] = true;
+  if(Object.keys(map[planId]).length === 0) delete map[planId];
+  saveDone(map);
+}
+
+/* ========= Grid render ========= */
+function renderGrid(){
+  cardsEl.innerHTML = '';
+  const idx = todayIndex();
+  todayLabel.textContent = `${dayName(idx)} • ${new Date().toLocaleDateString()}`;
+
+  if(!activeModule){
+    cardsEl.innerHTML = `<div class="small">Select a module to show cards.</div>`;
+    return;
+  }
+
+  const plans = loadPlans();
+  const exs = loadExercises();
+
+  const items = plans.filter(p => {
+    const tType = (p.exerciseSnapshot && p.exerciseSnapshot.type) || '';
+    return tType === activeModule && Array.isArray(p.days) && p.days.includes(idx);
+  });
+
+  if(items.length === 0){
+    cardsEl.innerHTML = `<div class="small">No items planned for ${cap(activeModule)} today. Use Create Plan to add.</div>`;
+    return;
+  }
+
+  const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+  items.forEach(p=>{
+    const ex = p.exerciseSnapshot || exs.find(e => e.id === p.exerciseId) || {};
+    const card = document.createElement('div'); card.className = 'card';
+    if(isDoneToday(p.id)) card.classList.add('completed');
+
+    /* Thumbnail with lazy loading and multi-source fallback */
+    const th = document.createElement('div'); th.className = 'thumb skeleton';
+    const img = document.createElement('img');
+    const candidates = imageCandidates(ex.image || '');
+    let i = 0;
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    img.src = candidates[i];
+    img.onerror = ()=>{ i++; if(i < candidates.length) img.src = candidates[i]; };
+    img.onload = ()=> th.classList.remove('skeleton');
+
+    const status = document.createElement('div'); status.className = 'status'; status.textContent = ex.category || cap(activeModule);
+    const doneOverlay = document.createElement('div'); doneOverlay.className = 'done'; doneOverlay.innerHTML = `<svg width="72" height="72" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" stroke="white" stroke-width="1.8" opacity="0.9"/><path d="M7 12.5l3 3 7-7" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+    th.appendChild(img); th.appendChild(status); th.appendChild(doneOverlay);
+
+    /* Body */
+    const body = document.createElement('div'); body.className = 'body';
+    const title = document.createElement('p'); title.className = 'title'; title.textContent = ex.name || 'Unnamed';
+    const metaRow = document.createElement('div'); metaRow.className = 'meta-row';
+    const chip = document.createElement('span'); chip.className = 'chip'; chip.textContent = (ex.type || activeModule).toUpperCase();
+    const days = document.createElement('span'); days.className = 'days'; days.textContent = `Days: ${ (p.days||[]).map(d=>dayNames[d]).join(', ') }`;
+    metaRow.appendChild(chip); metaRow.appendChild(days);
+    body.appendChild(title); body.appendChild(metaRow);
+
+    /* Footer actions */
+    const foot = document.createElement('div'); foot.className='foot';
+    const remove = document.createElement('button'); remove.className='btn'; remove.textContent='Remove';
+    remove.addEventListener('click', (ev)=>{
+      ev.stopPropagation();
+      if(confirm('Remove this item from weekly plan?')){
+        const newPlans = loadPlans().filter(x => x.id !== p.id);
+        localStorage.setItem('habitforge_plans', JSON.stringify(newPlans));
+        renderGrid();
+      }
+    });
+    foot.appendChild(remove);
+
+    /* Click anywhere toggles done */
+    card.addEventListener('click', ()=>{
+      toggleDoneToday(p.id);
+      card.classList.toggle('completed');
+    });
+
+    card.appendChild(th); card.appendChild(body); card.appendChild(foot);
+    cardsEl.appendChild(card);
+  });
+
+  /* IntersectionObserver for graceful lazy skeleton when images are far below */
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(en=>{
+      if(en.isIntersecting){
+        const imgs = en.target.querySelectorAll('img');
+        imgs.forEach(im=>{
+          // already set; this is just to ensure decoding kicks in
+          if(im.dataset.src){ im.src = im.dataset.src; delete im.dataset.src; }
+        });
+        io.unobserve(en.target);
+      }
+    });
+  }, { rootMargin: '200px' });
+  document.querySelectorAll('.card').forEach(c => io.observe(c));
+}
+
+/* ========= Init ========= */
+function initModule(){
+  const stats = JSON.parse(localStorage.getItem('habitforge_stats') || '{}');
+  const last = stats.lastModule || 'workout';
+  const el = Array.from(modulesEls).find(m => m.dataset.module === last) || modulesEls[0];
+  openModule(el.dataset.module);
+}
+
+function init(){
+  applyTheme();
+  applyName();
+  todayLabel.textContent = `${dayName(todayIndex())} • ${new Date().toLocaleDateString()}`;
+  initModule();
+  renderGrid();
+}
+
+document.getElementById('refreshBtn').addEventListener('click', renderGrid);
+document.getElementById('clearDataBtn').addEventListener('click', ()=>{
+  if(confirm('Clear exercises, plans, stats, name and done-state?')){
+    ['habitforge_exercises','habitforge_plans','habitforge_stats','habitforge_user_name','habitforge_done'].forEach(k => localStorage.removeItem(k));
+    applyName(); openModule('workout'); renderGrid();
+  }
+});
+
+init();
+</script>
+</body>
+</html>
