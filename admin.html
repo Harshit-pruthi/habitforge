@@ -14,8 +14,9 @@
   header{display:flex;justify-content:space-between;align-items:center}
   .panel{background:var(--surface);padding:12px;border-radius:12px;border:1px solid rgba(10,20,40,0.04)}
   form{display:flex;flex-direction:column;gap:8px}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
   input,select,textarea{padding:10px;border-radius:10px;border:1px solid rgba(10,20,40,0.06);width:100%}
-  .list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+  .list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
   .item{display:flex;gap:10px;align-items:center;padding:8px;border-radius:10px;border:1px solid rgba(10,20,40,0.04)}
   .thumb{width:84px;height:60px;border-radius:8px;object-fit:cover;background:#eef2ff}
   .btn{padding:10px 12px;border-radius:10px;border:1px solid rgba(10,20,40,0.06);cursor:pointer}
@@ -26,29 +27,24 @@
 <body>
   <div class="wrap">
     <header>
-      <div><strong>Admin</strong><div class="small">Add exercises (image URL/GDrive link)</div></div>
-      <div style="display:flex;gap:8px"><a class="btn" href="index.html">Back</a></div>
+      <div><strong>Admin</strong><div class="small">Add exercises (supports Drive links)</div></div>
+      <div><a class="btn" href="index.html">Back</a></div>
     </header>
 
     <section class="panel">
-      <form id="adminForm">
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <input id="name" placeholder="Exercise name" required style="flex:1" />
+      <form id="form">
+        <div class="row">
+          <input id="name" placeholder="Exercise name" required />
           <select id="type" style="width:180px">
-            <option value="workout">Workout</option>
-            <option value="diet">Diet</option>
-            <option value="martial">Martial Arts</option>
+            <option value="workout">Workout</option><option value="diet">Diet</option><option value="martial">Martial</option>
           </select>
         </div>
-
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <select id="category" style="width:240px"></select>
-          <input id="image" placeholder="Image or GIF URL (Drive link okay)" style="flex:1" />
+        <div class="row">
+          <select id="category" style="width:220px"></select>
+          <input id="image" placeholder="Image / GIF URL (Drive OK)" />
         </div>
-
         <textarea id="desc" rows="3" placeholder="Description (optional)"></textarea>
-
-        <div style="display:flex;gap:8px;justify-content:flex-end">
+        <div style="display:flex;justify-content:flex-end;gap:8px">
           <button type="button" class="btn" id="reset">Reset</button>
           <button type="submit" class="btn primary">Add Exercise</button>
         </div>
@@ -62,6 +58,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-analytics.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, addDoc, deleteDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAPrqqUbYzcPgFa34tKZvEB9IkT5yReJmw",
@@ -75,87 +72,83 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 getAnalytics(app);
 const auth = getAuth();
+const db = getFirestore();
 
-function localKey(k, uid){ return `${k}_${uid || 'guest'}`; }
-function getUid(){ return (auth.currentUser && auth.currentUser.uid) || 'guest'; }
-function loadArr(k){ try{return JSON.parse(localStorage.getItem(localKey(k,getUid())))||[];}catch(e){return []} }
-function saveArr(k,v){ localStorage.setItem(localKey(k,getUid()), JSON.stringify(v)); }
+const $ = (s,r=document) => r.querySelector(s);
+const form = $('#form'), nameIn = $('#name'), typeIn = $('#type'), catIn = $('#category'), imageIn = $('#image'), descIn = $('#desc'), listDiv = $('#list'), resetBtn = $('#reset');
 
 const TYPE_CATS = {
-  workout: ['Biceps','Triceps','Chest','Back','Abs','Legs','Shoulders','Cardio','Full Body','Mobility'],
-  diet: ['Breakfast','Lunch','Dinner','Snack','Supplements','Hydration'],
-  martial: ['Striking','Grappling','Forms','Footwork','Conditioning','Drills']
+  workout:['Biceps','Triceps','Chest','Back','Abs','Legs','Shoulders','Cardio','Full Body','Mobility'],
+  diet:['Breakfast','Lunch','Dinner','Snack','Supplements','Hydration'],
+  martial:['Striking','Grappling','Forms','Footwork','Conditioning','Drills']
 };
 
-const form = document.getElementById('adminForm');
-const nameIn = document.getElementById('name');
-const typeSel = document.getElementById('type');
-const catSel = document.getElementById('category');
-const imageIn = document.getElementById('image');
-const descIn = document.getElementById('desc');
-const listDiv = document.getElementById('list');
-const resetBtn = document.getElementById('reset');
+function localKey(k,uid='guest'){ return `${k}_${uid}`; }
+function uid(){ return auth.currentUser ? auth.currentUser.uid : 'guest'; }
+function loadLocal(k){ try{ return JSON.parse(localStorage.getItem(localKey(k, uid())))||[] }catch(e){return []}}
+function saveLocal(k,v){ localStorage.setItem(localKey(k, uid()), JSON.stringify(v)); }
+
+function imageCandidates(url){ if(!url) return ['']; const out=[]; if(/^data:|https?:\/\/.+\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url)) out.push(url); const m=url.match(/\/d\/([a-zA-Z0-9_-]{10,})/); if(m){ out.push(`https://drive.google.com/uc?export=view&id=${m[1]}`); out.push(`https://drive.google.com/thumbnail?id=${m[1]}`)} try{ const u=new URL(url); const id=u.searchParams.get('id'); if(id) out.push(`https://drive.google.com/uc?export=view&id=${id}`)}catch(e){} if(!out.includes(url)) out.push(url); out.push('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><rect width="100%" height="100%" fill="%23eef2ff"/></svg>'); return out; }
 
 function populateCats(type){
-  catSel.innerHTML='';
-  (TYPE_CATS[type]||[]).forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; catSel.appendChild(o); });
-}
-
-function imageCandidates(url){
-  if(!url) return [''];
-  const out=[]; if(/^data:|https?:\/\/.+\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url)) out.push(url);
-  const m = url.match(/\/d\/([a-zA-Z0-9_-]{10,})/); if(m){ out.push(`https://drive.google.com/uc?export=view&id=${m[1]}`); out.push(`https://drive.google.com/thumbnail?id=${m[1]}`); }
-  try{ const u=new URL(url); const id=u.searchParams.get('id'); if(id) out.push(`https://drive.google.com/uc?export=view&id=${id}`); }catch(e){}
-  if(!out.includes(url)) out.push(url);
-  out.push('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><rect width="100%" height="100%" fill="%23eef2ff"/></svg>');
-  return out;
+  catIn.innerHTML=''; (TYPE_CATS[type]||[]).forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; catIn.appendChild(o); });
 }
 
 function renderList(){
-  const exs = loadArr('habitforge_exercises');
+  const arr = loadLocal('habitforge_exercises');
   listDiv.innerHTML='';
-  if(exs.length===0){ listDiv.innerHTML = '<div class="small muted">No exercises yet.</div>'; return; }
-  exs.forEach(e=>{
-    const item = document.createElement('div'); item.className='item';
+  if(arr.length===0){ listDiv.innerHTML = '<div class="small">No exercises yet.</div>'; return; }
+  arr.forEach(e => {
+    const it = document.createElement('div'); it.className='item';
     const img = document.createElement('img'); img.className='thumb';
-    const c = imageCandidates(e.image||''); let i=0; img.src=c[i]; img.onerror=()=>{ i++; if(i<c.length) img.src=c[i]; };
-    const info = document.createElement('div'); info.style.flex='1'; info.innerHTML = `<div style="font-weight:700">${e.name}</div><div class="small muted">${e.type} • ${e.category}</div><div class="small">${e.desc||''}</div>`;
+    const c = imageCandidates(e.image||''); let i=0; img.src=c[i]; img.onerror = ()=>{ i++; if(i<c.length) img.src=c[i]; };
+    const info = document.createElement('div'); info.style.flex='1'; info.innerHTML = `<div style="font-weight:700">${e.name}</div><div class="small">${e.type} • ${e.category}</div><div class="small">${e.desc||''}</div>`;
     const del = document.createElement('button'); del.className='btn'; del.textContent='Delete';
-    del.addEventListener('click', ()=>{
-      if(!confirm('Delete exercise?')) return;
-      const arr = loadArr('habitforge_exercises').filter(x=>x.id !== e.id);
-      saveArr('habitforge_exercises', arr); renderList();
+    del.addEventListener('click', async ()=>{
+      if(!confirm('Delete this exercise?')) return;
+      // remove local
+      const newArr = loadLocal('habitforge_exercises').filter(x=>x.id !== e.id); saveLocal('habitforge_exercises', newArr);
+      // remove remote if signed in
+      if(auth.currentUser){ try{ await deleteDoc(doc(db, 'users', auth.currentUser.uid, 'exercises', e.id)); }catch(err){ console.warn('delete remote failed', err); } }
+      renderList();
     });
-    item.appendChild(img); item.appendChild(info); item.appendChild(del);
-    listDiv.appendChild(item);
+    it.appendChild(img); it.appendChild(info); it.appendChild(del); listDiv.appendChild(it);
   });
 }
 
-typeSel.addEventListener('change', ()=> populateCats(typeSel.value));
-resetBtn.addEventListener('click', ()=> { form.reset(); populateCats(typeSel.value); });
-
-form.addEventListener('submit', (ev)=>{
+form.addEventListener('submit', async (ev)=>{
   ev.preventDefault();
-  const name = nameIn.value.trim();
-  const type = typeSel.value;
-  const category = catSel.value || (TYPE_CATS[type] && TYPE_CATS[type][0]) || 'General';
-  const image = imageIn.value.trim();
-  const desc = descIn.value.trim();
+  const name = nameIn.value.trim(); const type = typeIn.value; const category = catIn.value || (TYPE_CATS[type]||[])[0] || 'General';
+  const image = imageIn.value.trim(); const desc = descIn.value.trim();
   if(!name) return alert('Name required');
-  const arr = loadArr('habitforge_exercises');
-  const obj = { id:'ex_'+Date.now()+'_'+Math.floor(Math.random()*9999), name, type, category, image, desc };
-  arr.unshift(obj); saveArr('habitforge_exercises', arr);
-  form.reset(); populateCats(typeSel.value); renderList(); alert('Added');
+  const obj = { id: 'ex_'+Date.now()+'_'+Math.floor(Math.random()*9999), name, type, category, image, desc, createdAt: Date.now() };
+  // local add
+  const arr = loadLocal('habitforge_exercises'); arr.unshift(obj); saveLocal('habitforge_exercises', arr);
+  // remote add if signed in
+  if(auth.currentUser){
+    try { await setDoc(doc(db, 'users', auth.currentUser.uid, 'exercises', obj.id), {...obj, uid:auth.currentUser.uid}); } catch(err){ console.warn('remote add failed', err); }
+  }
+  form.reset(); populateCats(typeIn.value); renderList(); alert('Added');
 });
 
-/* keep auth-aware uid mapping (data saved under current user) */
-onAuthStateChanged(auth, user=>{
-  // when user changed, simply re-render using their namespace
-  renderList();
+resetBtn.addEventListener('click', ()=>{ form.reset(); populateCats(typeIn.value); });
+
+onAuthStateChanged(auth, user => {
+  if(user){
+    // fetch remote exercises into local
+    (async ()=>{
+      try {
+        const snap = await getDocs(collection(db, 'users', user.uid, 'exercises'));
+        const arr = snap.docs.map(d=>d.data());
+        saveLocal('habitforge_exercises', arr);
+        renderList();
+      } catch(e){ console.warn('fetch ex failed', e); renderList(); }
+    })();
+  } else renderList();
 });
 
 // init
-populateCats(typeSel.value);
+populateCats(typeIn.value);
 renderList();
 </script>
 </body>
