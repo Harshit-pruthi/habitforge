@@ -2,79 +2,58 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>HabitForge — Create Plan</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{--bg:#F5F7FB;--surface:#fff;--muted:#6b7280;--text:#07122a;--accent1:#2b6ef6;--radius:12px}
-  body.dark{--bg:#071226;--surface:#071226;--muted:#9aa4b2;--text:#e6eef9}
-  *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui;padding:12px;background:var(--bg);color:var(--text);display:flex;justify-content:center}
+  :root{--bg:#F5F7FB;--surface:#fff;--muted:#6b7280;--text:#07122a;--accent:#2b6ef6;--radius:12px}
+  body.dark{--bg:#071226;--surface:#0b1522;--muted:#9aa4b2}
+  *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui;background:var(--bg);color:var(--text);padding:12px;display:flex;justify-content:center}
   .wrap{width:100%;max-width:980px;display:flex;flex-direction:column;gap:12px}
-  header{display:flex;align-items:center;justify-content:space-between}
-  .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent1),#6a9cff);display:grid;place-items:center;color:#fff}
-  .title{display:flex;flex-direction:column}
+  header{display:flex;justify-content:space-between;align-items:center}
   .panel{background:var(--surface);padding:12px;border-radius:12px;border:1px solid rgba(10,20,40,0.04)}
   .row{display:flex;gap:8px;flex-wrap:wrap}
-  .col{flex:1;min-width:120px}
-  input,select,textarea{padding:10px;border-radius:10px;border:1px solid rgba(10,20,40,0.06);width:100%}
-  .ex-list{margin-top:12px;display:flex;flex-direction:column;gap:10px}
-  .ex-item{display:flex;gap:10px;align-items:center;padding:8px;border-radius:10px;border:1px solid rgba(10,20,40,0.04)}
-  .thumb{width:84px;height:60px;border-radius:8px;object-fit:cover;background:#eef2ff}
+  select,input{padding:10px;border-radius:10px;border:1px solid rgba(10,20,40,0.06)}
+  .list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+  .ex{display:flex;gap:10px;align-items:center;padding:8px;border-radius:10px;border:1px solid rgba(10,20,40,0.04)}
+  .thumb{width:96px;height:64px;background:#eef2ff;border-radius:8px;object-fit:cover}
   .days{display:flex;gap:6px;flex-wrap:wrap}
   .day{padding:6px 8px;border-radius:8px;border:1px solid rgba(10,20,40,0.04);font-weight:700;cursor:pointer}
-  .day.selected{background:linear-gradient(90deg,var(--accent1),#6a9cff);color:#fff;border:0}
-  .footer{display:flex;justify-content:space-between;gap:8px}
-  .btn{padding:10px 12px;border-radius:10px;border:1px solid rgba(10,20,40,0.06);background:var(--surface);font-weight:700}
-  .btn.primary{background:linear-gradient(90deg,var(--accent1),#6a9cff);color:#fff;border:0}
+  .day.selected{background:linear-gradient(90deg,var(--accent),#6a9cff);color:#fff;border:0}
+  .btn{padding:10px 12px;border-radius:10px;border:1px solid rgba(10,20,40,0.06);background:var(--surface);font-weight:700;cursor:pointer}
+  .btn.primary{background:linear-gradient(90deg,var(--accent),#6a9cff);color:#fff;border:0}
   .small{font-size:13px;color:var(--muted)}
 </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <div style="display:flex;gap:10px;align-items:center">
-        <div class="logo">HF</div>
-        <div class="title"><strong>Create Plan</strong><div class="small">Pick module, choose exercises, select days</div></div>
-      </div>
-      <div style="display:flex;gap:8px">
-        <a class="btn" href="index.html">Back</a>
-      </div>
+      <div><strong>Create Plan</strong><div class="small">Pick exercises and select days</div></div>
+      <div style="display:flex;gap:8px"><a class="btn" href="index.html">Back</a></div>
     </header>
 
     <section class="panel">
-      <div class="row" style="align-items:center">
-        <div class="col">
-          <label class="small">Module</label>
-          <select id="moduleSelect">
-            <option value="workout">Workout</option>
-            <option value="diet">Diet</option>
-            <option value="martial">Martial Arts</option>
-          </select>
-        </div>
-        <div class="col"><label class="small">Category</label><select id="categorySelect"><option>All</option></select></div>
-        <div style="width:120px">
-          <label class="small">Search</label>
-          <input id="searchInput" placeholder="search" />
-        </div>
+      <div class="row">
+        <select id="moduleSelect"><option value="workout">Workout</option><option value="diet">Diet</option><option value="martial">Martial Arts</option></select>
+        <input id="search" placeholder="Search exercise name" style="flex:1" />
+        <button class="btn" id="btnReload">Reload</button>
       </div>
 
-      <div style="margin-top:12px" class="small muted">Tap an exercise to pick days then add to plan</div>
+      <div class="list" id="exList"></div>
 
-      <div id="exercises" class="ex-list"></div>
-
-      <div style="margin-top:12px;display:flex;justify-content:flex-end;gap:8px">
-        <button class="btn" id="exportBtn">Export</button>
-        <button class="btn primary" id="saveBtn">Save & Close</button>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px">
+        <button class="btn" id="btnExport">Export</button>
+        <button class="btn primary" id="btnDone">Done</button>
       </div>
     </section>
   </div>
 
 <script type="module">
-// firebase auth same imports to preserve sign-in state
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-analytics.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+import { getFirestore, collection, doc, setDoc, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAPrqqUbYzcPgFa34tKZvEB9IkT5yReJmw",
@@ -88,104 +67,98 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 getAnalytics(app);
 const auth = getAuth();
+const db = getFirestore();
 
-function localKey(k, uid){ return `${k}_${uid || 'guest'}`; }
-function getUid(){ return (auth.currentUser && auth.currentUser.uid) || 'guest'; }
+const $ = (s, r=document) => r.querySelector(s);
+const moduleSelect = $('#moduleSelect'), search = $('#search'), exList = $('#exList'), btnReload = $('#btnReload');
+const btnExport = $('#btnExport'), btnDone = $('#btnDone');
 
-function loadArr(k){ try { return JSON.parse(localStorage.getItem(localKey(k,getUid()))) || []; }catch(e){return []}}
-function saveArr(k,v){ localStorage.setItem(localKey(k,getUid()), JSON.stringify(v)); }
-
-const moduleSelect = document.getElementById('moduleSelect');
-const categorySelect = document.getElementById('categorySelect');
-const exercisesDiv = document.getElementById('exercises');
-const searchInput = document.getElementById('searchInput');
-const exportBtn = document.getElementById('exportBtn');
-const saveBtn = document.getElementById('saveBtn');
-
-const CATS = {
-  workout: ['All','Biceps','Triceps','Chest','Back','Abs','Legs','Shoulders','Cardio','Full Body','Mobility'],
-  diet: ['All','Breakfast','Lunch','Dinner','Snack','Supplements','Hydration'],
-  martial: ['All','Striking','Grappling','Forms','Footwork','Conditioning','Drills']
-};
+function localKey(k, uid='guest'){ return `${k}_${uid}`; }
+function uid(){ return auth.currentUser ? auth.currentUser.uid : 'guest'; }
+function loadLocal(k){ try{return JSON.parse(localStorage.getItem(localKey(k, uid())))||[];}catch(e){return []} }
+function saveLocal(k,v){ localStorage.setItem(localKey(k, uid()), JSON.stringify(v)); }
 
 function imageCandidates(url){
   if(!url) return [''];
-  const arr=[];
-  if(/^data:|https?:\/\/.+\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url)) arr.push(url);
-  const m = url.match(/\/d\/([a-zA-Z0-9_-]{10,})/);
-  if(m){ arr.push(`https://drive.google.com/uc?export=view&id=${m[1]}`); arr.push(`https://drive.google.com/thumbnail?id=${m[1]}`); }
-  try{ const u = new URL(url); const id = u.searchParams.get('id'); if(id) arr.push(`https://drive.google.com/uc?export=view&id=${id}`); }catch(e){}
-  if(!arr.includes(url)) arr.push(url);
-  arr.push('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><rect width="100%" height="100%" fill="%23eef2ff"/></svg>');
-  return arr;
-}
-
-function populateCategories(module){
-  categorySelect.innerHTML='';
-  (CATS[module] || ['All']).forEach(c => { const o=document.createElement('option'); o.value=c; o.textContent=c; categorySelect.appendChild(o); });
+  const out=[];
+  if(/^data:|https?:\/\/.+\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url)) out.push(url);
+  const m = url.match(/\/d\/([a-zA-Z0-9_-]{10,})/); if(m){ out.push(`https://drive.google.com/uc?export=view&id=${m[1]}`); out.push(`https://drive.google.com/thumbnail?id=${m[1]}`); }
+  try{ const u = new URL(url); const id = u.searchParams.get('id'); if(id) out.push(`https://drive.google.com/uc?export=view&id=${id}`); }catch(e){}
+  if(!out.includes(url)) out.push(url);
+  out.push('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><rect width="100%" height="100%" fill="%23eef2ff"/></svg>');
+  return out;
 }
 
 function renderExercises(){
-  const exs = loadArr('habitforge_exercises');
-  const module = moduleSelect.value;
-  const cat = categorySelect.value.toLowerCase();
-  const q = (searchInput.value || '').toLowerCase();
-  exercisesDiv.innerHTML='';
-  const filtered = exs.filter(e => e.type === module && (cat === 'all' || (e.category || '').toLowerCase() === cat)
-    && e.name.toLowerCase().includes(q));
-  if(filtered.length === 0){ exercisesDiv.innerHTML = '<div class="small muted">No exercises. Use Admin to add.</div>'; return; }
-
-  filtered.forEach(ex => {
-    const div = document.createElement('div'); div.className='ex-item';
+  exList.innerHTML = '';
+  const exs = loadLocal('habitforge_exercises');
+  const q = (search.value||'').toLowerCase();
+  const mod = moduleSelect.value;
+  const filtered = exs.filter(e => e.type === mod && e.name.toLowerCase().includes(q));
+  if(filtered.length === 0){ exList.innerHTML = '<div class="small">No exercises. Use Admin to add.</div>'; return; }
+  filtered.forEach(e => {
+    const row = document.createElement('div'); row.className='ex';
     const img = document.createElement('img'); img.className='thumb';
-    const cands = imageCandidates(ex.image || '');
-    let i=0; img.src = cands[i]; img.onerror = ()=>{ i++; if(i<cands.length) img.src=cands[i]; };
-    const info = document.createElement('div'); info.style.flex='1';
-    info.innerHTML = `<div style="font-weight:700">${ex.name}</div><div class="small muted">${ex.category}</div>`;
-    const selectDays = document.createElement('div'); selectDays.style.display='flex'; selectDays.style.flexDirection='column'; selectDays.style.gap='6px';
-    const daysDiv = document.createElement('div'); daysDiv.className='days';
+    const c = imageCandidates(e.image||''); let i=0; img.src=c[i]; img.onerror = ()=>{ i++; if(i<c.length) img.src=c[i]; };
+    const info = document.createElement('div'); info.style.flex='1'; info.innerHTML = `<div style="font-weight:700">${e.name}</div><div class="small">${e.category}</div>`;
+    const days = document.createElement('div'); days.className='days';
+    const dayButtons = [];
     ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach((d,idx)=>{
-      const b = document.createElement('button'); b.className='day'; b.textContent=d; b.dataset.day=idx;
+      const b = document.createElement('button'); b.className='day'; b.textContent = d; b.dataset.day = idx;
       b.addEventListener('click', ()=> b.classList.toggle('selected'));
-      daysDiv.appendChild(b);
+      days.appendChild(b); dayButtons.push(b);
     });
-    const addBtn = document.createElement('button'); addBtn.className='btn primary'; addBtn.textContent='Add to plan';
-    addBtn.addEventListener('click', ()=>{
-      const sel = Array.from(daysDiv.querySelectorAll('.day.selected')).map(b => Number(b.dataset.day));
-      if(sel.length === 0) return alert('Select at least one day');
-      const plans = loadArr('habitforge_plans');
-      const newPlan = { id: 'p_'+Date.now()+'_'+Math.floor(Math.random()*9999), exerciseId: ex.id, exerciseSnapshot: {...ex}, days: sel.sort((a,b)=>a-b), addedAt: Date.now() };
-      plans.push(newPlan); saveArr('habitforge_plans', plans);
+    const addBtn = document.createElement('button'); addBtn.className='btn primary'; addBtn.textContent='Add';
+    addBtn.addEventListener('click', async ()=> {
+      const sel = dayButtons.filter(b=>b.classList.contains('selected')).map(b=>Number(b.dataset.day));
+      if(sel.length===0) return alert('Select at least one day');
+      const plan = { id: 'p_'+Date.now()+'_'+Math.floor(Math.random()*9999), exerciseId: e.id, exerciseSnapshot: {...e}, days: sel.sort((a,b)=>a-b), addedAt: Date.now() };
+      // Save locally
+      const localPlans = loadLocal('habitforge_plans'); localPlans.push(plan); saveLocal('habitforge_plans', localPlans);
+      // push remote if signed in
+      if(auth.currentUser){
+        try {
+          await setDoc(doc(db, 'users', auth.currentUser.uid, 'plans', plan.id), {...plan, uid:auth.currentUser.uid, updatedAt:Date.now()});
+        } catch(err){ console.warn('create-plan setDoc failed', err); }
+      }
       alert('Added to plan');
     });
 
-    selectDays.appendChild(daysDiv); selectDays.appendChild(addBtn);
-    div.appendChild(img); div.appendChild(info); div.appendChild(selectDays);
-    exercisesDiv.appendChild(div);
+    row.appendChild(img); row.appendChild(info); row.appendChild(days); row.appendChild(addBtn);
+    exList.appendChild(row);
   });
 }
 
-/* event wiring */
-moduleSelect.addEventListener('change', ()=> { populateCategories(moduleSelect.value); renderExercises(); });
-categorySelect.addEventListener('change', renderExercises);
-searchInput.addEventListener('input', ()=> setTimeout(renderExercises, 150));
+moduleSelect.addEventListener('change', renderExercises);
+search.addEventListener('input', ()=> setTimeout(renderExercises, 150));
+btnReload.addEventListener('click', renderExercises);
 
-exportBtn.addEventListener('click', ()=>{
-  const data = {exercises: loadArr('habitforge_exercises'), plans: loadArr('habitforge_plans')};
-  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'}); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='habitforge-export.json'; a.click(); URL.revokeObjectURL(url);
+btnExport.addEventListener('click', ()=>{
+  const data = { exercises: loadLocal('habitforge_exercises'), plans: loadLocal('habitforge_plans') };
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'}); const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'habitforge-export.json'; a.click(); URL.revokeObjectURL(url);
 });
 
-saveBtn.addEventListener('click', ()=> { alert('Saved locally'); location.href='index.html'; });
+btnDone.addEventListener('click', ()=> location.href = 'index.html');
 
-/* initialize */
-populateCategories(moduleSelect.value);
+// keep local copies in sync with Firestore when auth changes
+onAuthStateChanged(auth, async user => {
+  if(user){
+    // fetch exercises & plans into local storage
+    try {
+      const exSnap = await getDocs(collection(db, 'users', user.uid, 'exercises'));
+      const plansSnap = await getDocs(collection(db, 'users', user.uid, 'plans'));
+      const exercises = exSnap.docs.map(d => d.data());
+      const plans = plansSnap.docs.map(d => d.data());
+      saveLocal('habitforge_exercises', exercises);
+      saveLocal('habitforge_plans', plans);
+    } catch(e){ console.warn('sync failed', e); }
+  }
+  renderExercises();
+});
+
+// initial render
 renderExercises();
-
-/* keep auth state in sync for per-user saving */
-onAuthStateChanged(auth, user => {
-  // when user signs in/out, we simply allow same local calls to save under uid (getUid uses auth.currentUser)
-  // nothing additional required here
-});
 </script>
 </body>
 </html>
